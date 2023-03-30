@@ -8,6 +8,7 @@
     <header>
       <h1>Twilio Voice JavaScript SDK Quickstart</h1>
       <button id="startup-button">Start up the Device</button>
+      <p id="fcmStatus">Not connected</p>
     </header>
     <main id="controls">
       <section class="left-column" id="info">
@@ -57,8 +58,18 @@
       </section>
     </main>
 
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.18.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.18.0/firebase-messaging-compat.js"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/firebase-messaging-sw.js');
+        });
+      }
+    </script>
+    <script type="module" src="firebase-messaging-sw.js"></script>
     <script type="text/javascript" src="twilio.min.js"></script>
-    <script src="quickstart.js"></script>
+    <script type="module" src="quickstart.js"></script>
   </body>
 </html>

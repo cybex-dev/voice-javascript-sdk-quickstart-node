@@ -1,4 +1,36 @@
-﻿$(function () {
+$(function () {
+  // Initialize the Firebase app in the service worker by passing the generated config
+  const firebaseConfig = {
+    apiKey: "",
+    authDomain: "",
+    databaseURL: "",
+    projectId: "",
+    storageBucket: "",
+    messagingSenderId: "",
+    appId: "",
+  };
+
+  firebase.initializeApp(firebaseConfig);
+
+  const messaging = firebase.messaging();
+  const fcmStatus = document.getElementById("fcmStatus");
+
+  messaging.getToken({
+    vapidKey: "",
+  }).then((currentToken) => {
+    if (currentToken) {
+      // request token
+      fcmStatus.innerText = currentToken;
+
+    } else {
+      console.warn('No token available.');
+      fcmStatus.innerText = "No token available.";
+    }
+  }).catch((err) => {
+    console.error('An error occurred while retrieving token. ', err);
+    fcmStatus.innerText = "Failed to acquire token.";
+  });
+
   const speakerDevices = document.getElementById("speaker-devices");
   const ringtoneDevices = document.getElementById("ringtone-devices");
   const outputVolumeBar = document.getElementById("output-volume");
@@ -36,7 +68,7 @@
   getAudioDevicesButton.onclick = getAudioDevices;
   speakerDevices.addEventListener("change", updateOutputDevice);
   ringtoneDevices.addEventListener("change", updateRingtoneDevice);
-  
+
 
   // SETUP STEP 1:
   // Browser client should be started after a user gesture
@@ -50,7 +82,7 @@
     try {
       const data = await $.getJSON("/token");
       log("Got a token.");
-      token = data.token;
+      token = data.Data.jwt;
       setClientNameUI(data.identity);
       intitializeDevice();
     } catch (err) {
