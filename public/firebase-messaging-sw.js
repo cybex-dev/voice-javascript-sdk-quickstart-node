@@ -11,13 +11,14 @@ if( 'function' === typeof importScripts) {
 
   // Initialize the Firebase app in the service worker by passing the generated config
   const firebaseConfig = {
-    apiKey: "",
-    authDomain: "",
-    databaseURL: "",
-    projectId: "",
-    storageBucket: "",
-    messagingSenderId: "",
-    appId: "",
+    apiKey: "AIzaSyBhIbqPRNjmaw7rsm0qsLoC7pBtYgBjwwk",
+    authDomain: "hyper-search-259de.firebaseapp.com",
+    databaseURL: "https://hyper-search-259de-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "hyper-search-259de",
+    storageBucket: "hyper-search-259de.appspot.com",
+    messagingSenderId: "786618085756",
+    appId: "1:786618085756:web:a3e4f8183139fd10b434f9",
+    measurementId: "G-BKCGNYGRBK"
   };
 
   firebase.initializeApp(firebaseConfig);

@@ -18,6 +18,7 @@ exports.tokenGenerator = function tokenGenerator() {
   accessToken.identity = identity;
   const grant = new VoiceGrant({
     outgoingApplicationSid: config.twimlAppSid,
+    pushCredentialSid: config.pushCredentialSid,
     incomingAllow: true,
   });
   accessToken.addGrant(grant);
@@ -34,12 +35,12 @@ exports.voiceResponse = function voiceResponse(requestBody) {
   const callerId = config.callerId;
   let twiml = new VoiceResponse();
 
-  // If the request to the /voice endpoint is TO your Twilio Number, 
+  // If the request to the /voice endpoint is TO your Twilio Number,
   // then it is an incoming call towards your Twilio.Device.
   if (toNumberOrClientName == callerId) {
     let dial = twiml.dial();
 
-    // This will connect the caller with your Twilio.Device/client 
+    // This will connect the caller with your Twilio.Device/client
     dial.client(identity);
 
   } else if (requestBody.To) {
@@ -49,7 +50,7 @@ exports.voiceResponse = function voiceResponse(requestBody) {
     let dial = twiml.dial({ callerId });
 
     // Check if the 'To' parameter is a Phone Number or Client Name
-    // in order to use the appropriate TwiML noun 
+    // in order to use the appropriate TwiML noun
     const attr = isAValidPhoneNumber(toNumberOrClientName)
       ? "number"
       : "client";
