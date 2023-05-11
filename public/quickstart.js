@@ -17,7 +17,7 @@ $(function () {
   const fcmStatus = document.getElementById("fcmStatus");
 
   messaging.getToken({
-    vapidKey: "",
+    vapidKey: "BHOQDHHDKeBusJi75mi-BP5Tx0VZ0PV4hYR8IzBiWcLhppu_QWJL1W8JRVK3oULnPfgfMm1HqnWWpNFLkdOBA2o",
   }).then((currentToken) => {
     if (currentToken) {
       // request token
@@ -102,12 +102,14 @@ $(function () {
       // Set Opus as our preferred codec. Opus generally performs better, requiring less bandwidth and
       // providing better audio quality in restrained network conditions.
       codecPreferences: ["opus", "pcmu"],
+
     });
 
     addDeviceListeners(device);
 
     // Device must be registered in order to receive incoming calls
     device.register();
+    device.onIncomingCallReceived(handleIncomingCall);
   }
 
   // SETUP STEP 4:
@@ -148,12 +150,16 @@ $(function () {
 
       // add listeners to the Call
       // "accepted" means the call has finished connecting and the state is now "open"
+      call.on("status", onStatusChange);
+      call.on("answer", handleAnswered);
+      call.on("connected", handleConnected);
       call.on("accept", updateUIAcceptedOutgoingCall);
       call.on("disconnect", updateUIDisconnectedOutgoingCall);
       call.on("cancel", updateUIDisconnectedOutgoingCall);
+      call.on("reject", updateCallRejected);
 
       outgoingCallHangupButton.onclick = () => {
-        log("Hanging up ...");
+        log("Hanging up ...");``
         call.disconnect();
       };
 
@@ -168,6 +174,10 @@ $(function () {
     outgoingCallHangupButton.classList.remove("hide");
     volumeIndicators.classList.remove("hide");
     bindVolumeIndicators(call);
+  }
+
+  function updateCallRejected() {
+    log("Call rejected.");
   }
 
   function updateUIDisconnectedOutgoingCall() {
@@ -200,6 +210,9 @@ $(function () {
     };
 
     // add event listener to call object
+    call.on("status", onStatusChange);
+    call.on("answer", handleAnswered);
+    call.on("connected", handleConnected);
     call.on("cancel", handleDisconnectedIncomingCall);
     call.on("disconnect", handleDisconnectedIncomingCall);
     call.on("reject", handleDisconnectedIncomingCall);
@@ -234,6 +247,18 @@ $(function () {
   }
 
   // HANDLE CANCELLED INCOMING CALL
+
+  function onStatusChange(status) {
+    console.log(`Status changed: ${status}`);
+  }
+
+  function handleAnswered() {
+    console.log("Answered!");
+  }
+
+  function handleConnected() {
+    console.log("Connected!");
+  }
 
   function handleDisconnectedIncomingCall() {
     log("Incoming call ended.");
