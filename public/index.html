@@ -7,9 +7,15 @@
   <body>
     <header>
       <h1>Twilio Voice JavaScript SDK Quickstart</h1>
+      <button id="sw-setup-button">Start up Service Worker</button>
       <button id="startup-button">Start up the Device</button>
       <p id="fcmStatus">Not connected</p>
     </header>
+    <section class="row">
+      <button id="notify-incoming-button">Notify Incoming Call</button>
+      <button id="notify-call-answer-button">Answer Notify</button>
+      <button id="notify-call-reject-button">Reject Notify</button>
+    </section>
     <main id="controls">
       <section class="left-column" id="info">
         <h2>Your Device Info</h2>
@@ -58,6 +64,7 @@
       </section>
     </main>
 
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.18.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.18.0/firebase-messaging-compat.js"></script>
@@ -68,7 +75,7 @@
         });
       }
     </script>
-    <script type="module" src="firebase-messaging-sw.js"></script>
+    <script type="module" src="sw/firebase-messaging-sw.js"></script>
     <script type="text/javascript" src="twilio.min.js"></script>
     <script type="module" src="quickstart.js"></script>
   </body>

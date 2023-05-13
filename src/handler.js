@@ -1,11 +1,11 @@
-const VoiceResponse = require("twilio").twiml.VoiceResponse;
-const AccessToken = require("twilio").jwt.AccessToken;
+const VoiceResponse = require('twilio').twiml.VoiceResponse;
+const AccessToken = require('twilio').jwt.AccessToken;
 const VoiceGrant = AccessToken.VoiceGrant;
 
-const nameGenerator = require("../name_generator");
-const config = require("../config");
+const nameGenerator = require('../name_generator');
+const config = require('../config');
 
-var identity;
+let identity;
 
 exports.tokenGenerator = function tokenGenerator() {
   identity = nameGenerator();
@@ -13,9 +13,11 @@ exports.tokenGenerator = function tokenGenerator() {
   const accessToken = new AccessToken(
     config.accountSid,
     config.apiKey,
-    config.apiSecret
+    config.apiSecret, {
+      ttl: 84600,
+      identity: identity,
+    },
   );
-  accessToken.identity = identity;
   const grant = new VoiceGrant({
     outgoingApplicationSid: config.twimlAppSid,
     pushCredentialSid: config.pushCredentialSid,
@@ -33,30 +35,29 @@ exports.tokenGenerator = function tokenGenerator() {
 exports.voiceResponse = function voiceResponse(requestBody) {
   const toNumberOrClientName = requestBody.To;
   const callerId = config.callerId;
-  let twiml = new VoiceResponse();
+  const twiml = new VoiceResponse();
 
   // If the request to the /voice endpoint is TO your Twilio Number,
   // then it is an incoming call towards your Twilio.Device.
-  if (toNumberOrClientName == callerId) {
-    let dial = twiml.dial();
+  if (toNumberOrClientName === callerId) {
+    const dial = twiml.dial();
 
     // This will connect the caller with your Twilio.Device/client
     dial.client(identity);
-
   } else if (requestBody.To) {
     // This is an outgoing call
 
     // set the callerId
-    let dial = twiml.dial({ callerId });
+    let dial = twiml.dial({callerId});
 
     // Check if the 'To' parameter is a Phone Number or Client Name
     // in order to use the appropriate TwiML noun
     const attr = isAValidPhoneNumber(toNumberOrClientName)
-      ? "number"
-      : "client";
+      ? 'number'
+      : 'client';
     dial[attr]({}, toNumberOrClientName);
   } else {
-    twiml.say("Thanks for calling!");
+    twiml.say('Thanks for calling!');
   }
 
   return twiml.toString();
