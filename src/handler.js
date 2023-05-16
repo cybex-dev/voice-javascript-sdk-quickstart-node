@@ -11,12 +11,12 @@ exports.tokenGenerator = function tokenGenerator() {
   identity = nameGenerator();
 
   const accessToken = new AccessToken(
-    config.accountSid,
-    config.apiKey,
-    config.apiSecret, {
-      ttl: 84600,
-      identity: identity,
-    },
+      config.accountSid,
+      config.apiKey,
+      config.apiSecret, {
+        ttl: 84600,
+        identity: identity,
+      }
   );
   const grant = new VoiceGrant({
     outgoingApplicationSid: config.twimlAppSid,
@@ -48,13 +48,13 @@ exports.voiceResponse = function voiceResponse(requestBody) {
     // This is an outgoing call
 
     // set the callerId
-    let dial = twiml.dial({callerId});
+    const dial = twiml.dial({callerId});
 
     // Check if the 'To' parameter is a Phone Number or Client Name
     // in order to use the appropriate TwiML noun
-    const attr = isAValidPhoneNumber(toNumberOrClientName)
-      ? 'number'
-      : 'client';
+    const attr = isAValidPhoneNumber(toNumberOrClientName) ?
+      'number' :
+      'client';
     dial[attr]({}, toNumberOrClientName);
   } else {
     twiml.say('Thanks for calling!');

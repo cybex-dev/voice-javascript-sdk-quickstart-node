@@ -13,6 +13,17 @@ _log('Started');
 
 addEventListener('activate', (event) => {
   _log('activate event', event);
+
+  // Optional: Get a list of all the current open windows/tabs under
+  // our service worker's control, and force them to reload.
+  // This can "unbreak" any open windows/tabs as soon as the new
+  // service worker activates, rather than users having to manually reload.
+  // source: https://stackoverflow.com/a/38980776/4628115
+  self.clients.matchAll({type: 'window'}).then(windowClients => {
+    windowClients.forEach(windowClient => {
+      windowClient.navigate(windowClient.url);
+    });
+  });
 });
 
 addEventListener('fetch', (event) => {
@@ -20,7 +31,13 @@ addEventListener('fetch', (event) => {
 });
 
 addEventListener('install', (event) => {
-  _log('install event', event);
+  _log('install event, skip waiting', event);
+
+  // Skip over the "waiting" lifecycle state, to ensure that our
+  // new service worker is activated immediately, even if there's
+  // another tab open controlled by our older service worker code.
+  // source: https://stackoverflow.com/a/38980776/4628115
+  self.skipWaiting();
 });
 
 addEventListener('message', (event) => {

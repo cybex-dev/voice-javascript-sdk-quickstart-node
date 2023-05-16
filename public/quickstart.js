@@ -97,14 +97,11 @@ $(function() {
 
     if ('serviceWorker' in navigator) {
       try {
-        sw = await navigator.serviceWorker.register('sw.js');
+        sw = await navigator.serviceWorker.register('sw/twilio-sw.js');
         log('Service worker registered! 😎', sw);
         await navigator.serviceWorker.ready;
         swController = navigator.serviceWorker.controller;
         log('Service worker controller ready! 😎', swController);
-        swController.postMessage({
-          action: 'test',
-        });
         await waitForServiceWorkerReadyAndSetupUI();
       } catch (err) {
         log('😥 Service worker registration failed: ', err);
@@ -180,9 +177,9 @@ $(function() {
   // to avoid errors in the browser console re: AudioContext
   startupButton.addEventListener('click', startupClient);
 
-  // maybeLoadServiceWorker();
+  listenForServiceWorker();
 
-  async function maybeLoadServiceWorker() {
+  async function listenForServiceWorker() {
     if ('serviceWorker' in navigator) {
       try {
         sw = await navigator.serviceWorker.ready;
@@ -190,9 +187,6 @@ $(function() {
         await navigator.serviceWorker.ready;
         swController = navigator.serviceWorker.controller;
         log('Service worker controller ready! 😎', swController);
-        swController.postMessage({
-          action: 'test',
-        });
         await waitForServiceWorkerReadyAndSetupUI();
       } catch (err) {
         log('😥 Service worker registration failed: ', err);
