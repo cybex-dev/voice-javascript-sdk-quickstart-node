@@ -133,6 +133,10 @@ function handleMessage(event) {
             _showIncomingCallNotification(payload);
             break;
         }
+        case 'cancel': {
+            cancelNotification(payload);
+            break;
+        }
     }
 }
 

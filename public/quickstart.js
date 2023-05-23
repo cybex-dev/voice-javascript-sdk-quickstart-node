@@ -194,11 +194,6 @@ $(function () {
                 incomingCallRejectButton.click();
                 break;
             }
-            case 'focus': {
-                log('Focusing on call from SW');
-                window.focus();
-                break;
-            }
             default: {
                 log('Unknown action from SW', event);
             }
@@ -213,11 +208,17 @@ $(function () {
                 // await navigator.serviceWorker.getRegistration();
                 // let list = [];
                 // list = await navigator.serviceWorker.getRegistrations();
-                const sw = await navigator.serviceWorker.ready;
+                navigator.serviceWorker.oncontrollerchange = (ev) => {
+                    log('Service Worker Controller Changed', ev);
+                }
+                navigator.serviceWorker.onmessage = (ev) => {
+                    handleMessageFromSW(ev.data);
+                }
+                navigator.serviceWorker.onmessageerror = (ev) => {
+                    log('Service Worker Message Error', ev);
+                }
+                await navigator.serviceWorker.ready;
                 swController = navigator.serviceWorker.controller;
-                window.addEventListener('message', (event) => {
-                    handleMessageFromSW(event);
-                });
                 log('Twilio Service Worker Ready');
             } catch (err) {
                 log('😥 Service worker registration failed: ', err);
@@ -227,6 +228,7 @@ $(function () {
 
     // SETUP STEP 2: Request an Access Token
     async function startupClient() {
+        requestNotificationPermissions();
         log('Requesting Access Token...');
 
         try {
@@ -417,9 +419,15 @@ $(function () {
         };
 
         // add event listener to call object
-        call.on('cancel', handleDisconnectedIncomingCall);
-        call.on('disconnect', handleDisconnectedIncomingCall);
-        call.on('reject', handleDisconnectedIncomingCall);
+        call.on('cancel', () => {
+            handleDisconnectedIncomingCall(call.parameters.CallSid);
+        });
+        call.on('disconnect', () => {
+            handleDisconnectedIncomingCall(call.parameters.CallSid);
+        });
+        call.on('reject', () => {
+            handleDisconnectedIncomingCall(call.parameters.CallSid);
+        });
     }
 
     // ACCEPT INCOMING CALL
@@ -450,6 +458,15 @@ $(function () {
         resetIncomingCallUI();
     }
 
+    function cancelIncomingCallNotification(callSid) {
+        if (swController) {
+            swController.postMessage({
+                action: 'cancel',
+                payload: callSid,
+            });
+        }
+    }
+
     // HANDLE CANCELLED INCOMING CALL
 
     function onStatusChange(status) {
@@ -464,9 +481,10 @@ $(function () {
         console.log("Connected!");
     }
 
-    function handleDisconnectedIncomingCall() {
+    function handleDisconnectedIncomingCall(callSid) {
         log('Incoming call ended.');
         resetIncomingCallUI();
+        cancelIncomingCallNotification(callSid);
     }
 
     // MISC USER INTERFACE

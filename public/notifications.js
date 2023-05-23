@@ -16,14 +16,34 @@ function hasNotificationPermissions() {
 }
 
 function showNotification(title, options) {
-    if (!requestNotificationPermissions()) {
-        _error('Cannot show an incoming call notification without permissions', title, options);
+    if (!hasNotificationPermissions()) {
+        _error('Cannot show notification without permissions');
         return;
     }
-
-    if (hasNotificationPermissions()) {
-        self.registration.showNotification(title, options).catch((error) => {
-            _error('Error showing notification', error);
-        });
-    }
+    self.registration.showNotification(title, options).catch((error) => {
+        _error('Error showing notification', error);
+    });
 }
+
+function getNotificationByTag(tag) {
+    return self.registration.getNotifications().then((notifications) => {
+        return notifications.find((notification) => {
+            return notification.tag === tag;
+        });
+    });
+}
+
+function cancelNotification(tag) {
+    if (!tag) {
+        _error('Cannot cancel a notification with no tag', tag);
+        return;
+    }
+    _log("Canceling notification: ", tag)
+    return getNotificationByTag(tag).then((notification) => {
+        if (notification) {
+            notification.close();
+            _log("Notification cancelled: ", tag)
+        }
+    });
+}
+
